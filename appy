@@ -1,816 +1,402 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galería · Portafolio Streamlit</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet">
+import streamlit as st
+
+st.set_page_config(
+    page_title="Galería · Portafolio Streamlit",
+    page_icon="🎨",
+    layout="wide",
+)
+
+# ── Datos de las 20 aplicaciones ───────────────────────────────────────────
+APPS = [
+    {"num": "01", "title": "Traductor de Texto",         "cat": "NLP · Traducción",    "tag": "nlp",        "icon": "🌐", "url": "https://traductor-1.streamlit.app/"},
+    {"num": "02", "title": "App de Audio",               "cat": "Audio · NLP",         "tag": "audio nlp",  "icon": "🔊", "url": "https://audio1.streamlit.app/"},
+    {"num": "03", "title": "Una App",                    "cat": "IA General",          "tag": "ia",         "icon": "🧩", "url": "https://unaapp.streamlit.app/"},
+    {"num": "04", "title": "Proyecto Demo",              "cat": "IA General",          "tag": "ia",         "icon": "⚡", "url": "https://aaaaaa2.streamlit.app/"},
+    {"num": "05", "title": "Traductor de Imágenes",      "cat": "NLP · Visión",        "tag": "nlp vision", "icon": "🖼️", "url": "https://traductorimg.streamlit.app/"},
+    {"num": "06", "title": "Análisis de Sentimientos",   "cat": "NLP · Sentimientos",  "tag": "nlp",        "icon": "💬", "url": "https://sentimenta-1.streamlit.app/"},
+    {"num": "07", "title": "TF-IDF Español",             "cat": "NLP · TF-IDF",        "tag": "nlp",        "icon": "📊", "url": "https://tdfesp-1.streamlit.app/"},
+    {"num": "08", "title": "Demo TF-IDF",                "cat": "NLP · Demo",          "tag": "nlp",        "icon": "📈", "url": "https://demotfidf.streamlit.app/"},
+    {"num": "09", "title": "Detector de Imágenes",       "cat": "Visión · Detección",  "tag": "vision",     "icon": "🔍", "url": "https://detectorimagen.streamlit.app/"},
+    {"num": "10", "title": "Traductor Avanzado",         "cat": "NLP · Traducción",    "tag": "nlp",        "icon": "🌍", "url": "https://traductor-adawr4aw5ks5l2kmzy4zpq.streamlit.app/"},
+    {"num": "11", "title": "YOLOv5 Detector",            "cat": "Visión · YOLO",       "tag": "vision",     "icon": "🎯", "url": "https://yolov51.streamlit.app/"},
+    {"num": "12", "title": "Receptor MQTT",              "cat": "IoT · MQTT",          "tag": "iot",        "icon": "📡", "url": "https://recepmqtt-d2pzpesymrkowp3ptyegrs.streamlit.app/"},
+    {"num": "13", "title": "Emisor MQTT",                "cat": "IoT · MQTT",          "tag": "iot",        "icon": "📤", "url": "https://sendcmqtt-1.streamlit.app/"},
+    {"num": "14", "title": "Control por Voz",            "cat": "Audio · IoT",         "tag": "audio iot",  "icon": "🎙️", "url": "https://ctrlvoice1.streamlit.app/"},
+    {"num": "15", "title": "Reconocimiento de Dígitos",  "cat": "Visión · IA",         "tag": "vision ia",  "icon": "🔢", "url": "https://reconocimientodigitos1.streamlit.app/"},
+    {"num": "16", "title": "Reconocimiento de Dibujos",  "cat": "Visión · Dibujo",     "tag": "vision ia",  "icon": "✏️", "url": "https://drawrecogni.streamlit.app/"},
+    {"num": "17", "title": "Historias Infantiles",       "cat": "IA · Generativa",     "tag": "ia nlp",     "icon": "📖", "url": "https://historiasinfantiles.streamlit.app/"},
+    {"num": "18", "title": "Vision App",                 "cat": "Visión · IA",         "tag": "vision ia",  "icon": "👁️", "url": "https://visionapp-cdll4scmlpnggnnh4m5qjf.streamlit.app/"},
+    {"num": "19", "title": "Chat con PDF",               "cat": "NLP · Documentos",    "tag": "nlp ia",     "icon": "📄", "url": "https://chatpdf1.streamlit.app/"},
+    {"num": "20", "title": "LSTM NLP",                   "cat": "NLP · Deep Learning", "tag": "nlp ia",     "icon": "🧠", "url": "http://lstmnlp-pq3hqydqdi7mdegdcrw3fg.streamlit.app/"},
+]
+
+CATEGORIES = {
+    "Todas":        "all",
+    "NLP & Texto":  "nlp",
+    "Visión":       "vision",
+    "IoT & MQTT":   "iot",
+    "Audio":        "audio",
+    "IA General":   "ia",
+}
+
+# ── CSS ────────────────────────────────────────────────────────────────────
+st.markdown("""
 <style>
-  :root {
-    --bg: #0a0a08;
-    --surface: #111110;
-    --card: #161614;
-    --border: #2a2a26;
-    --gold: #c9a84c;
-    --gold-light: #e2c278;
-    --cream: #f0ead8;
-    --muted: #6b6b5e;
-    --accent: #8b4513;
-    --white: #f5f0e8;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&family=Cormorant+Garamond:wght@300;400;600&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+html, body, [data-testid="stAppViewContainer"] {
+    background: #0a0a08 !important;
+    color: #f5f0e8;
+}
+[data-testid="stHeader"], [data-testid="stToolbar"],
+[data-testid="stDecoration"], footer { display: none !important; }
+[data-testid="stAppViewContainer"] { padding: 0 !important; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
 
-  body {
-    background: var(--bg);
-    color: var(--white);
-    font-family: 'DM Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Grain overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 1000;
-    opacity: 0.4;
-  }
-
-  /* Header */
-  header {
-    padding: 80px 60px 40px;
-    border-bottom: 1px solid var(--border);
-    position: relative;
-  }
-
-  .header-inner {
-    max-width: 1400px;
-    margin: 0 auto;
+/* ── Header ── */
+.gal-header {
+    padding: 64px 60px 40px;
+    border-bottom: 1px solid #2a2a26;
     display: flex;
-    align-items: flex-end;
     justify-content: space-between;
-    gap: 40px;
-  }
-
-  .gallery-label {
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+.gal-label {
     font-family: 'DM Mono', monospace;
     font-size: 10px;
-    letter-spacing: 0.3em;
-    color: var(--gold);
+    letter-spacing: .3em;
+    color: #c9a84c;
     text-transform: uppercase;
-    margin-bottom: 16px;
-  }
-
-  h1 {
+    margin-bottom: 14px;
+}
+.gal-h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-size: clamp(2.6rem, 5vw, 5rem);
     font-weight: 400;
     line-height: 1.05;
-    color: var(--cream);
-    letter-spacing: -0.02em;
-  }
-
-  h1 em {
-    font-style: italic;
-    color: var(--gold-light);
-  }
-
-  .header-meta {
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .count-label {
-    font-size: 10px;
-    letter-spacing: 0.25em;
-    color: var(--muted);
+    color: #f0ead8;
+    letter-spacing: -.02em;
+    margin: 0;
+}
+.gal-h1 em { font-style: italic; color: #e2c278; }
+.gold-line { width: 60px; height: 1px; background: #c9a84c; margin: 18px 0; }
+.gal-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #6b6b5e;
+    letter-spacing: .08em;
+    line-height: 1.8;
+    max-width: 420px;
+}
+.gal-count-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .25em;
+    color: #6b6b5e;
     text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .count-number {
+    margin-bottom: 6px;
+    text-align: right;
+}
+.gal-count-num {
     font-family: 'Playfair Display', serif;
-    font-size: 4rem;
-    color: var(--border);
+    font-size: 5rem;
+    color: #2a2a26;
     line-height: 1;
     font-style: italic;
-  }
+    text-align: right;
+}
 
-  /* Divider line */
-  .gold-line {
-    width: 60px;
-    height: 1px;
-    background: var(--gold);
-    margin: 20px 0;
-  }
-
-  /* Filter bar */
-  .filter-bar {
-    padding: 24px 60px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 24px;
-  }
-
-  .filter-bar-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
+/* ── Filter bar ── */
+.filter-bar {
+    padding: 20px 60px;
+    border-bottom: 1px solid #2a2a26;
     display: flex;
     align-items: center;
     gap: 16px;
-  }
-
-  .filter-label {
-    font-size: 9px;
-    letter-spacing: 0.3em;
-    color: var(--muted);
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-
-  .tags {
-    display: flex;
-    gap: 8px;
     flex-wrap: wrap;
-  }
+}
+.filter-label-txt {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .3em;
+    color: #6b6b5e;
+    text-transform: uppercase;
+}
+.stRadio > div { flex-direction: row !important; gap: 8px !important; flex-wrap: wrap; }
+.stRadio label {
+    padding: 5px 14px !important;
+    border: 1px solid #2a2a26 !important;
+    background: transparent !important;
+    color: #6b6b5e !important;
+    font-family: 'DM Mono', monospace !important;
+    font-size: 10px !important;
+    letter-spacing: .15em !important;
+    cursor: pointer !important;
+    border-radius: 0 !important;
+    transition: all .2s !important;
+}
+.stRadio label:hover { border-color: #c9a84c !important; color: #c9a84c !important; }
+.stRadio [aria-checked="true"] label {
+    border-color: #c9a84c !important;
+    color: #c9a84c !important;
+    background: rgba(201,168,76,.07) !important;
+}
 
-  .tag {
-    padding: 5px 14px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
+/* ── Stats bar ── */
+.stats-bar {
+    padding: 12px 60px;
+    background: #0e0e0c;
+    border-bottom: 1px solid #1a1a18;
     font-family: 'DM Mono', monospace;
     font-size: 10px;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    transition: all 0.2s;
+    letter-spacing: .2em;
+    color: #6b6b5e;
     text-transform: uppercase;
-  }
+}
+.stats-bar span { color: #c9a84c; }
 
-  .tag:hover, .tag.active {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(201,168,76,0.06);
-  }
+/* ── Gallery wrapper ── */
+.gallery-wrap { padding: 48px 60px 60px; }
 
-  /* Gallery grid */
-  .gallery {
-    padding: 60px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 2px;
-  }
-
-  /* Card */
-  .card {
-    position: relative;
-    background: var(--card);
-    border: 1px solid var(--border);
+/* ── Card ── */
+.app-card {
+    background: #161614;
+    border: 1px solid #2a2a26;
+    transition: border-color .25s, transform .2s, box-shadow .2s;
+    overflow: hidden;
     cursor: pointer;
-    overflow: hidden;
-    transition: border-color 0.3s;
-    text-decoration: none;
+    text-decoration: none !important;
     display: block;
-    animation: fadeUp 0.6s both;
-  }
+}
+.app-card:hover {
+    border-color: #c9a84c;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.65);
+    text-decoration: none !important;
+}
 
-  .card:hover {
-    border-color: var(--gold);
-    z-index: 2;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* stagger */
-  .card:nth-child(1) { animation-delay: 0.05s; }
-  .card:nth-child(2) { animation-delay: 0.10s; }
-  .card:nth-child(3) { animation-delay: 0.15s; }
-  .card:nth-child(4) { animation-delay: 0.20s; }
-  .card:nth-child(5) { animation-delay: 0.25s; }
-  .card:nth-child(6) { animation-delay: 0.30s; }
-  .card:nth-child(7) { animation-delay: 0.35s; }
-  .card:nth-child(8) { animation-delay: 0.40s; }
-  .card:nth-child(9) { animation-delay: 0.45s; }
-  .card:nth-child(10){ animation-delay: 0.50s; }
-  .card:nth-child(11){ animation-delay: 0.55s; }
-  .card:nth-child(12){ animation-delay: 0.60s; }
-  .card:nth-child(13){ animation-delay: 0.65s; }
-  .card:nth-child(14){ animation-delay: 0.70s; }
-  .card:nth-child(15){ animation-delay: 0.75s; }
-  .card:nth-child(16){ animation-delay: 0.80s; }
-
-  /* Preview area */
-  .preview {
-    width: 100%;
-    height: 220px;
-    position: relative;
-    overflow: hidden;
-    background: var(--surface);
-  }
-
-  .preview iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    pointer-events: none;
-    transform: scale(1);
-    transform-origin: top left;
-    opacity: 0.85;
-    transition: opacity 0.4s;
-  }
-
-  .card:hover .preview iframe {
-    opacity: 1;
-  }
-
-  /* Overlay shimmer on hover */
-  .preview::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-  .card:hover .preview::after { opacity: 1; }
-
-  /* Placeholder for iframe load */
-  .preview-placeholder {
-    position: absolute;
-    inset: 0;
+/* ── Preview ── */
+.card-preview {
+    height: 185px;
+    background: #111110;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    background: var(--surface);
-  }
-
-  .preview-placeholder .icon {
-    font-size: 2.5rem;
-    opacity: 0.4;
-  }
-
-  .preview-placeholder .loading-text {
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
-  /* Number badge */
-  .badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    padding: 3px 8px;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+.card-icon { font-size: 3rem; opacity: .45; transition: opacity .25s; }
+.app-card:hover .card-icon { opacity: .9; }
+.card-preview-label {
     font-family: 'DM Mono', monospace;
-    z-index: 2;
-  }
-
-  /* Visit btn overlay */
-  .visit-overlay {
+    font-size: 9px;
+    letter-spacing: .22em;
+    color: #6b6b5e;
+    text-transform: uppercase;
+    padding: 0 16px;
+    text-align: center;
+    line-height: 1.5;
+}
+.card-num {
+    position: absolute;
+    top: 10px; left: 10px;
+    background: #0a0a08;
+    border: 1px solid #2a2a26;
+    color: #6b6b5e;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .2em;
+    padding: 3px 8px;
+}
+.card-preview::after {
+    content: '';
     position: absolute;
     inset: 0;
-    background: rgba(10,10,8,0.85);
+    background: linear-gradient(135deg, rgba(201,168,76,.09) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+}
+.app-card:hover .card-preview::after { opacity: 1; }
+.card-hover-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,10,8,.82);
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.25s;
-    z-index: 3;
-  }
-
-  .card:hover .visit-overlay { opacity: 1; }
-
-  .visit-btn {
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    padding: 10px 28px;
+    transition: opacity .25s;
+}
+.app-card:hover .card-hover-overlay { opacity: 1; }
+.visit-btn-inner {
+    border: 1px solid #c9a84c;
+    color: #c9a84c;
+    padding: 9px 24px;
     font-family: 'DM Mono', monospace;
     font-size: 10px;
-    letter-spacing: 0.3em;
+    letter-spacing: .3em;
     text-transform: uppercase;
-    background: transparent;
-    transition: all 0.2s;
-  }
+}
 
-  .visit-btn:hover {
-    background: var(--gold);
-    color: var(--bg);
-  }
-
-  /* Card footer */
-  .card-footer {
-    padding: 18px 20px 20px;
-    border-top: 1px solid var(--border);
+/* ── Card footer ── */
+.card-footer {
+    padding: 16px 18px 18px;
+    border-top: 1px solid #2a2a26;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 12px;
-  }
-
-  .card-info { flex: 1; }
-
-  .card-category {
+    gap: 10px;
+}
+.card-cat {
+    font-family: 'DM Mono', monospace;
     font-size: 9px;
-    letter-spacing: 0.25em;
-    color: var(--gold);
+    letter-spacing: .25em;
+    color: #c9a84c;
     text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .card-title {
+    margin-bottom: 5px;
+}
+.card-title-txt {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.25rem;
+    font-size: 1.18rem;
     font-weight: 600;
-    color: var(--cream);
+    color: #f0ead8;
     line-height: 1.2;
-    letter-spacing: 0.01em;
-  }
-
-  .card-url {
-    font-size: 9px;
-    color: var(--muted);
+}
+.card-url-txt {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: #4a4a40;
     margin-top: 5px;
-    letter-spacing: 0.05em;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 200px;
-  }
+    max-width: 220px;
+}
+.card-arrow { color: #c9a84c; font-size: 1.1rem; padding-top: 4px; flex-shrink: 0; }
 
-  .arrow-icon {
-    color: var(--gold);
-    font-size: 1.1rem;
-    margin-top: 4px;
-    transition: transform 0.2s;
-    flex-shrink: 0;
-  }
-
-  .card:hover .arrow-icon { transform: translate(3px, -3px); }
-
-  /* Footer */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 40px 60px;
+/* ── Footer ── */
+.gal-footer {
+    border-top: 1px solid #2a2a26;
+    padding: 32px 60px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-
-  .footer-inner {
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-    display: flex;
     align-items: center;
-    justify-content: space-between;
-  }
-
-  .footer-brand {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+}
+.footer-brand {
     font-family: 'Playfair Display', serif;
     font-size: 1rem;
-    color: var(--gold);
+    color: #c9a84c;
     font-style: italic;
-    letter-spacing: 0.05em;
-    text-transform: none;
-  }
+}
+.footer-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .2em;
+    color: #6b6b5e;
+    text-transform: uppercase;
+}
 
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); }
-
-  @media (max-width: 768px) {
-    header { padding: 40px 24px 32px; }
-    .header-inner { flex-direction: column; align-items: flex-start; }
-    .header-meta { text-align: left; }
-    .filter-bar { padding: 16px 24px; }
-    .gallery { padding: 32px 24px; }
-    .grid { grid-template-columns: 1fr; gap: 2px; }
-    footer { padding: 32px 24px; }
-    .footer-inner { flex-direction: column; gap: 12px; align-items: flex-start; }
-  }
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .gal-header, .filter-bar, .stats-bar, .gallery-wrap, .gal-footer {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+    .gal-h1 { font-size: 2.2rem !important; }
+}
 </style>
-</head>
-<body>
+""", unsafe_allow_html=True)
 
-<header>
-  <div class="header-inner">
-    <div>
-      <div class="gallery-label">Portafolio · Streamlit Cloud</div>
-      <h1>La <em>Galería</em><br>de Aplicaciones</h1>
-      <div class="gold-line"></div>
-      <p style="font-size:11px; color: var(--muted); letter-spacing:0.08em; max-width:420px; line-height:1.8;">
-        Una colección curada de aplicaciones web construidas con Streamlit.<br>Haz clic en cualquier obra para visitarla.
-      </p>
-    </div>
-    <div class="header-meta">
-      <div class="count-label">Obras en exposición</div>
-      <div class="count-number">16</div>
-    </div>
+
+# ── Header ─────────────────────────────────────────────────────────────────
+st.markdown(f"""
+<div class="gal-header">
+  <div>
+    <div class="gal-label">Portafolio · Streamlit Cloud</div>
+    <h1 class="gal-h1">La <em>Galería</em><br>de Aplicaciones</h1>
+    <div class="gold-line"></div>
+    <p class="gal-sub">Una colección curada de aplicaciones web construidas con Streamlit.<br>
+    Haz clic en cualquier obra para visitarla en una nueva pestaña.</p>
   </div>
-</header>
-
-<div class="filter-bar">
-  <div class="filter-bar-inner">
-    <span class="filter-label">Colección ·</span>
-    <div class="tags">
-      <button class="tag active" onclick="filterCards('all', this)">Todas</button>
-      <button class="tag" onclick="filterCards('nlp', this)">NLP &amp; Texto</button>
-      <button class="tag" onclick="filterCards('vision', this)">Visión</button>
-      <button class="tag" onclick="filterCards('iot', this)">IoT &amp; MQTT</button>
-      <button class="tag" onclick="filterCards('audio', this)">Audio</button>
-      <button class="tag" onclick="filterCards('ia', this)">IA General</button>
-    </div>
+  <div>
+    <div class="gal-count-label">Obras en exposición</div>
+    <div class="gal-count-num">{len(APPS)}</div>
   </div>
 </div>
+""", unsafe_allow_html=True)
 
-<div class="gallery">
-  <div class="grid" id="grid">
 
-    <!-- IoT / MQTT -->
-    <a class="card" href="https://recepmqtt-d2pzpesymrkowp3ptyegrs.streamlit.app/" target="_blank" rel="noopener" data-cat="iot">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">📡</div>
-          <div class="loading-text">Receptor MQTT</div>
-        </div>
-        <div class="badge">01</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">IoT · MQTT</div>
-          <div class="card-title">Receptor MQTT</div>
-          <div class="card-url">recepmqtt-d2pzpesymrkowp3ptyegrs.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
+# ── Filter ─────────────────────────────────────────────────────────────────
+st.markdown('<div class="filter-bar"><span class="filter-label-txt">Colección ·&nbsp;&nbsp;</span>', unsafe_allow_html=True)
 
-    <a class="card" href="https://sendcmqtt-1.streamlit.app/" target="_blank" rel="noopener" data-cat="iot">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">📤</div>
-          <div class="loading-text">Emisor MQTT</div>
-        </div>
-        <div class="badge">02</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">IoT · MQTT</div>
-          <div class="card-title">Emisor MQTT</div>
-          <div class="card-url">sendcmqtt-1.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
+selected_label = st.radio(
+    label="Filtrar",
+    options=list(CATEGORIES.keys()),
+    horizontal=True,
+    label_visibility="collapsed",
+)
+selected_tag = CATEGORIES[selected_label]
+st.markdown('</div>', unsafe_allow_html=True)
 
-    <a class="card" href="https://ctrlvoice1.streamlit.app/" target="_blank" rel="noopener" data-cat="audio iot">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🎙️</div>
-          <div class="loading-text">Control por Voz</div>
-        </div>
-        <div class="badge">03</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">Audio · IoT</div>
-          <div class="card-title">Control por Voz</div>
-          <div class="card-url">ctrlvoice1.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
 
-    <!-- NLP / Texto -->
-    <a class="card" href="https://traductor-1.streamlit.app/" target="_blank" rel="noopener" data-cat="nlp">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🌐</div>
-          <div class="loading-text">Traductor de Texto</div>
-        </div>
-        <div class="badge">04</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">NLP · Traducción</div>
-          <div class="card-title">Traductor de Texto</div>
-          <div class="card-url">traductor-1.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
+# ── Stats bar ──────────────────────────────────────────────────────────────
+filtered = [a for a in APPS if selected_tag == "all" or selected_tag in a["tag"]]
 
-    <a class="card" href="https://audio1.streamlit.app/" target="_blank" rel="noopener" data-cat="audio nlp">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🔊</div>
-          <div class="loading-text">App de Audio</div>
-        </div>
-        <div class="badge">05</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">Audio · NLP</div>
-          <div class="card-title">App de Audio</div>
-          <div class="card-url">audio1.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://unaapp.streamlit.app/" target="_blank" rel="noopener" data-cat="ia">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🧩</div>
-          <div class="loading-text">Una App</div>
-        </div>
-        <div class="badge">06</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">IA General</div>
-          <div class="card-title">Una App</div>
-          <div class="card-url">unaapp.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://aaaaaa2.streamlit.app/" target="_blank" rel="noopener" data-cat="ia">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">⚡</div>
-          <div class="loading-text">Proyecto Demo</div>
-        </div>
-        <div class="badge">07</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">IA General</div>
-          <div class="card-title">Proyecto Demo</div>
-          <div class="card-url">aaaaaa2.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://traductorimg.streamlit.app/" target="_blank" rel="noopener" data-cat="nlp vision">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🖼️</div>
-          <div class="loading-text">Traductor de Imágenes</div>
-        </div>
-        <div class="badge">08</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">NLP · Visión</div>
-          <div class="card-title">Traductor de Imágenes</div>
-          <div class="card-url">traductorimg.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://sentimenta-1.streamlit.app/" target="_blank" rel="noopener" data-cat="nlp">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">💬</div>
-          <div class="loading-text">Análisis de Sentimientos</div>
-        </div>
-        <div class="badge">09</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">NLP · Sentimientos</div>
-          <div class="card-title">Análisis de Sentimientos</div>
-          <div class="card-url">sentimenta-1.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://tdfesp-1.streamlit.app/" target="_blank" rel="noopener" data-cat="nlp">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">📊</div>
-          <div class="loading-text">TF-IDF Español</div>
-        </div>
-        <div class="badge">10</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">NLP · TF-IDF</div>
-          <div class="card-title">TF-IDF Español</div>
-          <div class="card-url">tdfesp-1.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://demotfidf.streamlit.app/" target="_blank" rel="noopener" data-cat="nlp">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">📈</div>
-          <div class="loading-text">Demo TF-IDF</div>
-        </div>
-        <div class="badge">11</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">NLP · Demo</div>
-          <div class="card-title">Demo TF-IDF</div>
-          <div class="card-url">demotfidf.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <!-- Visión -->
-    <a class="card" href="https://detectorimagen.streamlit.app/" target="_blank" rel="noopener" data-cat="vision">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🔍</div>
-          <div class="loading-text">Detector de Imágenes</div>
-        </div>
-        <div class="badge">12</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">Visión · Detección</div>
-          <div class="card-title">Detector de Imágenes</div>
-          <div class="card-url">detectorimagen.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://traductor-adawr4aw5ks5l2kmzy4zpq.streamlit.app/" target="_blank" rel="noopener" data-cat="nlp">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🌍</div>
-          <div class="loading-text">Traductor Avanzado</div>
-        </div>
-        <div class="badge">13</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">NLP · Traducción</div>
-          <div class="card-title">Traductor Avanzado</div>
-          <div class="card-url">traductor-adawr4aw5ks5l2kmzy4zpq.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://yolov51.streamlit.app/" target="_blank" rel="noopener" data-cat="vision">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🎯</div>
-          <div class="loading-text">YOLOv5 Detector</div>
-        </div>
-        <div class="badge">14</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">Visión · YOLO</div>
-          <div class="card-title">YOLOv5 Detector</div>
-          <div class="card-url">yolov51.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://reconocimientodigitos1.streamlit.app/" target="_blank" rel="noopener" data-cat="vision ia">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">🔢</div>
-          <div class="loading-text">Reconocimiento de Dígitos</div>
-        </div>
-        <div class="badge">15</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">Visión · IA</div>
-          <div class="card-title">Reconocimiento de Dígitos</div>
-          <div class="card-url">reconocimientodigitos1.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://drawrecogni.streamlit.app/" target="_blank" rel="noopener" data-cat="vision ia">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">✏️</div>
-          <div class="loading-text">Reconocimiento de Dibujos</div>
-        </div>
-        <div class="badge">16</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">Visión · Dibujo</div>
-          <div class="card-title">Reconocimiento de Dibujos</div>
-          <div class="card-url">drawrecogni.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-    <a class="card" href="https://historiasinfantiles.streamlit.app/" target="_blank" rel="noopener" data-cat="ia nlp">
-      <div class="preview">
-        <div class="preview-placeholder">
-          <div class="icon">📖</div>
-          <div class="loading-text">Historias Infantiles</div>
-        </div>
-        <div class="badge">17</div>
-        <div class="visit-overlay"><div class="visit-btn">Visitar →</div></div>
-      </div>
-      <div class="card-footer">
-        <div class="card-info">
-          <div class="card-category">IA · Generativa</div>
-          <div class="card-title">Historias Infantiles</div>
-          <div class="card-url">historiasinfantiles.streamlit.app</div>
-        </div>
-        <div class="arrow-icon">↗</div>
-      </div>
-    </a>
-
-  </div>
+st.markdown(f"""
+<div class="stats-bar">
+  Mostrando <span>{len(filtered)}</span> de <span>{len(APPS)}</span> obras
+  &nbsp;·&nbsp; Categoría: <span>{selected_label}</span>
 </div>
+""", unsafe_allow_html=True)
 
-<footer>
-  <div class="footer-inner">
-    <span class="footer-brand">Galería Streamlit</span>
-    <span>17 aplicaciones · Streamlit Cloud · 2025</span>
+
+# ── Gallery grid ───────────────────────────────────────────────────────────
+st.markdown('<div class="gallery-wrap">', unsafe_allow_html=True)
+
+COLS = 3
+rows = [filtered[i:i + COLS] for i in range(0, len(filtered), COLS)]
+
+for row in rows:
+    cols = st.columns(len(row), gap="small")
+    for col, app in zip(cols, row):
+        with col:
+            domain = app["url"].replace("https://", "").replace("http://", "").rstrip("/")
+            st.markdown(f"""
+<a class="app-card" href="{app['url']}" target="_blank" rel="noopener noreferrer">
+  <div class="card-preview">
+    <div class="card-num">{app['num']}</div>
+    <div class="card-icon">{app['icon']}</div>
+    <div class="card-preview-label">{app['title']}</div>
+    <div class="card-hover-overlay">
+      <div class="visit-btn-inner">Visitar →</div>
+    </div>
   </div>
-</footer>
+  <div class="card-footer">
+    <div style="min-width:0; flex:1;">
+      <div class="card-cat">{app['cat']}</div>
+      <div class="card-title-txt">{app['title']}</div>
+      <div class="card-url-txt">{domain}</div>
+    </div>
+    <div class="card-arrow">↗</div>
+  </div>
+</a>
+""", unsafe_allow_html=True)
 
-<script>
-  function filterCards(cat, btn) {
-    document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
+st.markdown('</div>', unsafe_allow_html=True)
 
-    const cards = document.querySelectorAll('.card');
-    cards.forEach((card, i) => {
-      const cardCat = card.getAttribute('data-cat') || '';
-      const show = cat === 'all' || cardCat.includes(cat);
-      card.style.display = show ? 'block' : 'none';
-      if (show) {
-        card.style.animation = 'none';
-        card.offsetHeight; // reflow
-        card.style.animation = `fadeUp 0.4s ${i * 0.05}s both`;
-      }
-    });
 
-    // update counter
-    const visible = [...cards].filter(c => c.style.display !== 'none').length;
-    document.querySelector('.count-number').textContent = visible;
-  }
-</script>
-</body>
-</html>
+# ── Footer ─────────────────────────────────────────────────────────────────
+st.markdown(f"""
+<div class="gal-footer">
+  <span class="footer-brand">Galería Streamlit</span>
+  <span class="footer-meta">{len(APPS)} aplicaciones · Streamlit Cloud · 2025</span>
+</div>
+""", unsafe_allow_html=True)
